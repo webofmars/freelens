@@ -219,7 +219,13 @@ export class Terminal {
   };
 
   keyHandler = (evt: KeyboardEvent): boolean => {
-    const { code, ctrlKey, metaKey } = evt;
+    const { code, ctrlKey, metaKey, altKey } = evt;
+
+    // Don't interfere with AltGr combinations (Ctrl+Alt on Windows/Linux)
+    // AltGr is used for special characters on non-US keyboards
+    if (ctrlKey && altKey) {
+      return true;
+    }
 
     // Handle custom hotkey bindings
     if (ctrlKey) {
