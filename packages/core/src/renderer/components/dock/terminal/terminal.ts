@@ -224,9 +224,10 @@ export class Terminal {
   keyHandler = (evt: KeyboardEvent): boolean => {
     const { code, ctrlKey, metaKey, altKey, key } = evt;
 
-    // If the key event will produce a printable character, don't interfere
+    // If the key event will produce a printable character (not a control character), don't interfere
     // This handles special characters typed with Alt/Option on macOS and AltGr on Windows/Linux
-    if (key && key.length === 1) {
+    // Exclude Ctrl/Cmd combinations which are control sequences
+    if (key && key.length === 1 && !ctrlKey && !metaKey) {
       return true;
     }
 
