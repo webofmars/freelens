@@ -157,6 +157,8 @@ export class Terminal {
   };
 
   onData = (data: string) => {
+    // DEBUG: Log what xterm.js sends to the backend
+    console.log('[TERMINAL] Received data:', JSON.stringify(data), 'charCodes:', Array.from(data).map(c => c.charCodeAt(0)));
     if (!this.api.isReady) return;
     this.api.sendMessage({
       type: TerminalChannels.STDIN,
@@ -223,11 +225,23 @@ export class Terminal {
 
   keyHandler = (evt: KeyboardEvent): boolean => {
     const { code, ctrlKey, metaKey, altKey, key } = evt;
+    
+    // DEBUG: Log keyboard events to understand what the browser detects
+    console.log('[TERMINAL] Key event:', { 
+      key, 
+      code, 
+      ctrlKey, 
+      metaKey, 
+      altKey, 
+      shiftKey: evt.shiftKey,
+      keyLength: key?.length 
+    });
 
     // If the key event will produce a printable character (not a control character), don't interfere
     // This handles special characters typed with Alt/Option on macOS and AltGr on Windows/Linux
     // Exclude Ctrl/Cmd combinations which are control sequences
     if (key && key.length === 1 && !ctrlKey && !metaKey) {
+      console.log('[TERMINAL] -> Allowing printable character through');
       return true;
     }
 
@@ -235,6 +249,7 @@ export class Terminal {
     // - AltGr (Ctrl+Alt) on Windows/Linux for characters like |, @, {, }
     // - Option key on macOS for characters like |, @, etc.
     if (altKey && (ctrlKey || this.dependencies.isMac)) {
+      console.log('[TERMINAL] -> Allowing Alt/Option combo through');
       return true;
     }
 
@@ -243,11 +258,15 @@ export class Terminal {
       switch (code) {
         // Ctrl+C: prevent terminal exit on windows / linux (?)
         case "KeyC":
-          if (this.xterm.hasSelection()) return false;
+          if (this.xterm.hasSelection()) {
+            console.log('[TERMINAL] -> Blocking Ctrl+C (has selection)');
+            return false;
+          }
           break;
 
         // Ctrl+W: prevent unexpected terminal tab closing, e.g. editing file in vim
         case "KeyW":
+          console.log('[TERMINAL] -> Preventing Ctrl+W default');
           evt.preventDefault();
           break;
       }
@@ -257,11 +276,13 @@ export class Terminal {
     if (this.dependencies.isMac && metaKey) {
       switch (code) {
         case "KeyK":
+          console.log('[TERMINAL] -> Handling Cmd+K (clear)');
           this.onClear();
           break;
       }
     }
 
+    console.log('[TERMINAL] -> Passing through to xterm');
     return true;
   };
 }
