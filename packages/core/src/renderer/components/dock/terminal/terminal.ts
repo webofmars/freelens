@@ -224,7 +224,7 @@ export class Terminal {
     // Don't interfere with Alt/Option key combinations used for special characters
     // - AltGr (Ctrl+Alt) on Windows/Linux for characters like |, @, {, }
     // - Option key on macOS for characters like |, @, etc.
-    if (altKey) {
+    if (altKey && (ctrlKey || this.dependencies.isMac)) {
       return true;
     }
 
