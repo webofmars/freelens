@@ -222,9 +222,15 @@ export class Terminal {
   };
 
   keyHandler = (evt: KeyboardEvent): boolean => {
-    const { code, ctrlKey, metaKey, altKey } = evt;
+    const { code, ctrlKey, metaKey, altKey, key } = evt;
 
-    // Don't interfere with Alt/Option key combinations used for special characters
+    // If the key event will produce a printable character, don't interfere
+    // This handles special characters typed with Alt/Option on macOS and AltGr on Windows/Linux
+    if (key && key.length === 1) {
+      return true;
+    }
+
+    // Don't interfere with Alt/Option key combinations that might produce special characters
     // - AltGr (Ctrl+Alt) on Windows/Linux for characters like |, @, {, }
     // - Option key on macOS for characters like |, @, etc.
     if (altKey && (ctrlKey || this.dependencies.isMac)) {
