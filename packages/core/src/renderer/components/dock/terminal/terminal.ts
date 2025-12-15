@@ -221,9 +221,10 @@ export class Terminal {
   keyHandler = (evt: KeyboardEvent): boolean => {
     const { code, ctrlKey, metaKey, altKey } = evt;
 
-    // Don't interfere with AltGr combinations (Ctrl+Alt on Windows/Linux)
-    // AltGr is used for special characters on non-US keyboards
-    if (ctrlKey && altKey) {
+    // Don't interfere with Alt/Option key combinations used for special characters
+    // - AltGr (Ctrl+Alt) on Windows/Linux for characters like |, @, {, }
+    // - Option key on macOS for characters like |, @, etc.
+    if (altKey) {
       return true;
     }
 
