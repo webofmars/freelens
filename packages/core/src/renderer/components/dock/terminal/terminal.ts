@@ -95,6 +95,9 @@ export class Terminal {
       cursorStyle: "bar",
       fontSize: this.fontSize,
       fontFamily: this.fontFamily,
+      // Allow Alt/Option key to type special characters instead of sending escape sequences
+      // This is critical for non-US keyboard layouts on macOS and for AltGr on Windows/Linux
+      macOptionIsMeta: false,
     });
     // enable terminal addons
     this.xterm.loadAddon(this.fitAddon);
